@@ -1,0 +1,7 @@
+experiments/
+node_modules/
+docs/
+ogr2osm/
+
+.DS_Store
+data/
