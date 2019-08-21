@@ -36,15 +36,20 @@ tar xvf ./data/red_vial_nactional.zip -C ./data/
 
 ### RED_VIAL (road network)
 
-#### Convert to geojson
+#### Convert to geojson and reproject to WGS84
 
-`ogr2ogr -f "GeoJSON" ./data/red_vial.geojson ./data/conjunto_de_datos/red_vial.shp`
+`ogr2ogr -f "GeoJSON" -t_srs EPSG:4326 ./data/red_vial.geojson ./data/conjunto_de_datos/red_vial.shp`
+
+
+<!-- -s_srs EPSG:42310  -->
+
+Note: ogr2ogr will kick out a warning. ignore and it'll finish anyways -- the .prj files have a weird addition of `,AUTHORITY["INEGI",200008]` that's throwing off ogr2ogr.
 
 this is technically unecessary, and makes the files large and difficult to move -- I could do the tag editing from the `shp` files using ogr2osm, but geojson is significantly easier to read, and the workflow is faster than importing into QGIS to verify changes.
 
 To pull out a smaller test area (city of Oaxaca):
 
-`ogr2ogr -f "GeoJSON" -clipdst -96.2815845252 16.6653639064 -97.1650256074 17.4549186072 ./data/red_vial-oaxaca.geojson ./data/conjunto_de_datos/red_vial.shp`
+`ogr2ogr -f "GeoJSON" -t_srs EPSG:4326 -clipdst -96.2815845252 16.6653639064 -97.1650256074 17.4549186072 ./data/red_vial-oaxaca.geojson ./data/conjunto_de_datos/red_vial.shp`
 
 
 #### Edit tags
@@ -80,6 +85,29 @@ To pull out a smaller test area (city of Oaxaca):
 ### PLAZA_COBRO (toll booths)
 
 ...
+
+#### to geojson
+
+`ogr2ogr -f "GeoJSON" -t_srs EPSG:4326 ./data/plaza_cobro.geojson ./data/conjunto_de_datos/plaza_cobro.shp`
+
+for oaxaca only:
+
+`ogr2ogr -f "GeoJSON" -t_srs EPSG:4326 -clipdst -96.2815845252 16.6653639064 -97.1650256074 17.4549186072 ./data/plaza_cobro-oaxaca.geojson ./data/conjunto_de_datos/plaza_cobro.shp`
+
+### MANIOBRA_PROHIBIDA
+
+Turn restrictions -- these needs to become relations on the ways of the `RED_VIAL`
+
+`ogr2ogr -f "GeoJSON" -t_srs EPSG:4326 ./data/maniobra_prohibida.geojson ./data/conjunto_de_datos/maniobra_prohibida.shp`
+
+for oaxaca only:
+
+`ogr2ogr -f "GeoJSON" -t_srs EPSG:4326 -clipdst -96.2815845252 16.6653639064 -97.1650256074 17.4549186072 ./data/maniobra_prohibida-oaxaca.geojson ./data/conjunto_de_datos/maniobra_prohibida.shp`
+
+* these restrictions do not include any sort of field for type of restriction. OSM requires one of: `no_right_turn`, `no_left_turn`, `no_u_turn`, `no_straight_on`, `only_right_turn`, `only_left_turn`, `only_straight_on`, `no_entry`, or `no_exit`. A restriction consists of a `from` member, 1 or more `via` members, and a `to` member. 
+* also only one node is every implicated in the restriction, regardless of number of ways involved. A heuristic for determining if the `via` should be the `union` node or multiple ways is number of implicated ways (have to count ways with `"N/A"` values)
+* A hueristic for assuming type of restriction is turn angle and number of members in the restriction. A simple restriction of two members and an angle of 90 is `no_right_turn`.
+
 
 ### docker and osrm:
 ```
