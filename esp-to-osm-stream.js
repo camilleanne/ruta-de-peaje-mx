@@ -25,6 +25,7 @@ stream.on('data', (data) => {
   let props = data.properties;
 
   props.id = +props.ID_RED.toString();
+  delete props.ID_RED;
 
   // highway type logging by visualization scale
   if (vial_log[props.ESCALA_VIS][props.TIPO_VIAL]) vial_log[props.ESCALA_VIS][props.TIPO_VIAL] ++;
@@ -37,6 +38,9 @@ stream.on('data', (data) => {
   delete props.CALIREPR;
   delete props.FECHA_ACT;
   delete props.ESTATUS;
+  delete props.UNION_INI;
+  delete props.UNION_FIN;
+  delete props.LONGITUD;
 
   // NOMBRE -> name
   props.name = props.NOMBRE;
@@ -104,6 +108,8 @@ stream.on('data', (data) => {
     else if (props.ESCALA_VIS = 4) props.highway = 'unclassified';
     else if (props.ESCALA_VIS = 5) props.highway = 'unclassified';
   }
+  delete props.TIPO_VIAL;
+  delete props.ESCALA_VIS;
 
   if (props.CONDICION == 'En construcción - abierto') {
     props.construction = 'minor';

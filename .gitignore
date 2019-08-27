@@ -4,4 +4,4 @@ docs/
 ogr2osm/
 
 .DS_Store
-data/
+data/*
