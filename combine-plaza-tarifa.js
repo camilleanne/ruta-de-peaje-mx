@@ -2,8 +2,15 @@ const fs = require('fs')
 
 const L = require('@turf/length');
 
+var argv = require('minimist')(process.argv.slice(2));
+if (!argv.i) return console.log('please provide an input file with -i {filename}');
+if (!argv.o) return console.log('please provide an input file with -o {filename');
+
+const input = argv.i;
+const output = argv.o;
+
 const tarifas = JSON.parse(fs.readFileSync('./data/tarifas.geojson').toString())
-const peajes = JSON.parse(fs.readFileSync('./data/plaza_cobro-oaxaca.geojson').toString())
+const peajes = JSON.parse(fs.readFileSync(input).toString())
 
 for (var i = 0; i < peajes.features.length; i++) {
   let peaje = peajes.features[i]
@@ -25,7 +32,7 @@ for (var i = 0; i < peajes.features.length; i++) {
     if (id == id_start && id == id_end) {
       
       peaje.properties.TYPE = 'entry'
-      peaje.properties.barrier = 'toll-booth';
+      peaje.properties.barrier = 'toll_booth';
       peaje.properties.fee = tarifa.properties.T_AUTO;
 
       peaje.properties.name = peaje.properties.NOMBRE
@@ -43,4 +50,4 @@ for (var i = 0; i < peajes.features.length; i++) {
   }
 }
 
-fs.writeFileSync('./data/tarifas-entry-merged-oaxaca.geojson',JSON.stringify(peajes,null,2))
+fs.writeFileSync(output,JSON.stringify(peajes,null,2));

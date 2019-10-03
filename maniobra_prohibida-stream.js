@@ -3,16 +3,20 @@
 // - pass input and output filenames from CLI
 // - add flag for logging
 
-
 const fs = require('fs');
 const JSONStream = require('JSONStream');
 const angle = require('@turf/angle');
 const bearing = require('@turf/bearing');
 
-const turf = require('@turf/turf')
+var argv = require('minimist')(process.argv.slice(2));
 
-const input = './data/oaxaca-tiny/mp-tiny-u.geojson';
-const output = './data/oaxaca-tiny/mp-tiny-edited.geojson';
+if (!argv.i) return console.log('please provide an input file with -i {filename}');
+if (!argv.o) return console.log('please provide an input file with -o {filename');
+
+const input = argv.i;
+const output = argv.o;
+
+const turf = require('@turf/turf')
 
 const stream = fs.createReadStream(input).pipe(JSONStream.parse(['features', true]));
 

@@ -60,7 +60,7 @@ To pull out a smaller test area (city of Oaxaca):
 
   NOMBRE -> name
   PEAJE -> toll
-  NIVEL -> level
+  NIVEL -> layer
   CARRILES -> lanes
   ANCHO -> width
   TIPO_VIAL -> highway // further classification of highway tag by ESCALA_VIS
@@ -77,8 +77,10 @@ To pull out a smaller test area (city of Oaxaca):
   ```
 ### convert to .osm for OSRM
   `python3 ogr2osm.py ../data/red-vial-edited.geojson`
-  
-  * issues with ids -- why are they all negative? to keep out of osm id space? need to see if I can use id of geojson way as osm way id. I may need the original id's to integrate the plazas de peaje
+ 
+  * ~issues with ids -- why are they all negative? to keep out of osm id space? need to see if I can use id of geojson way as osm way id. I may need the original id's to integrate the plazas de peaje~
+    * use `red-vial` branch of [ogr2osm](https://github.com/camilleanne/ogr2osm/)
+    * this branch will keep all original IDs, any any generated IDs will be cast as negative.
   * oneways -- everything seems ok in qgis -- oneways look like oneways going in the right direction, but need to confirm
   * to run the entire country from geojson is going to take... forever. need a bigger instance (running out of memory, not CPU)
 
@@ -120,7 +122,7 @@ for Oaxaca only:
 
 `ogr2ogr -f "GeoJSON" -t_srs EPSG:4326 -clipdst -96.2815845252 16.6653639064 -97.1650256074 17.4549186072 ./data/maniobra_prohibida-oaxaca.geojson ./data/conjunto_de_datos/maniobra_prohibida.shp`
 
-####merge `maniobra_prohibida` with `union` in QGIS
+#### merge `maniobra_prohibida` with `union` in QGIS
 
 * open `union`
 * `vector` -> `geometry tools` -> `add geometry attributes`
@@ -130,6 +132,8 @@ for Oaxaca only:
 * these restrictions do not include any sort of field for type of restriction. OSM requires one of: `no_right_turn`, `no_left_turn`, `no_u_turn`, `no_straight_on`, `only_right_turn`, `only_left_turn`, `only_straight_on`, `no_entry`, or `no_exit`. A restriction consists of a `from` member, 1 or more `via` members, and a `to` member. 
 * also only one node is every implicated in the restriction, regardless of number of ways involved. A heuristic for determining if the `via` should be the `union` node or multiple ways is number of implicated ways (have to count ways with `"N/A"` values)
 * A hueristic for assuming type of restriction is turn angle and number of members in the restriction. A simple restriction of two members and an angle of 90 is `no_right_turn`.
+
+NOTE: there's a massive problem with the turn restrictions in the data set. The union nodes have a range of 0 to over 1000000, but the referenced nodes in the turn restrictions data limits the id to 6 digits.
 
 
 ### docker and osrm:

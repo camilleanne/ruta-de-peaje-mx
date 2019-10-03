@@ -5,9 +5,13 @@
 
 const fs = require('fs');
 const JSONStream = require('JSONStream');
+var argv = require('minimist')(process.argv.slice(2));
 
-const input = './data/red-vial.geojson';
-const output = './data/red-vial-edited.geojson';
+if (!argv.i) return console.log('please provide an input file with -i {filename}');
+if (!argv.o) return console.log('please provide an input file with -o {filename');
+
+const input = argv.i;
+const output = argv.o;
 
 const stream = fs.createReadStream(input).pipe(JSONStream.parse(['features', true]));
 
@@ -48,13 +52,14 @@ stream.on('data', (data) => {
   if (props.name == 'N/A') delete props.name;
   if (props.name == 'N/D') delete props.name;
 
-  // PEAJE -> toll
-  props.toll = props.PEAJE;
-  delete props.PEAJE;
-  props.toll = props.toll == 'Si' ? 'yes' : 'no';
+  // // PEAJE -> toll
+  // props.toll = props.PEAJE;
+  // delete props.PEAJE;
+  // props.toll = props.toll == 'Si' ? 'yes' : 'no';
 
-  // NIVEL -> level
-  props.level = props.NIVEL;
+  // NIVEL -> layer
+  if (props.NIVEL > 0) props.layer = props.NIVEL;
+  // props.layer = props.NIVEL;
   delete props.NIVEL;
 
   // CARRILES -> lanes
@@ -79,11 +84,11 @@ stream.on('data', (data) => {
   else if (props.highway == 'Otro') props.highway = 'road';
   // road ramps 
   else if (props.highway == 'Enlace') {
-    if (props.ESCALA_VIS == 1) props.highway = 'trunk-link';
-    if (props.ESCALA_VIS == 2) props.highway = 'primary-link';
-    if (props.ESCALA_VIS == 3) props.highway = 'secondary-link';
-    if (props.ESCALA_VIS == 4) props.highway = 'tertiary-link';
-    if (props.ESCALA_VIS == 5) props.highway = 'tertiary-link';
+    if (props.ESCALA_VIS == 1) props.highway = 'trunk_link';
+    if (props.ESCALA_VIS == 2) props.highway = 'primary_link';
+    if (props.ESCALA_VIS == 3) props.highway = 'secondary_link';
+    if (props.ESCALA_VIS == 4) props.highway = 'tertiary_link';
+    if (props.ESCALA_VIS == 5) props.highway = 'tertiary_link';
   } else {
     if (props.highway == 'Glorieta') props.junction = 'roundabout';
     else if (props.highway == 'Callejón') props.service = 'alley';

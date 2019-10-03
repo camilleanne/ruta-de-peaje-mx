@@ -5,9 +5,13 @@
 
 const fs = require('fs');
 const JSONStream = require('JSONStream');
+var argv = require('minimist')(process.argv.slice(2));
 
-const input = './data/union-oaxaca.geojson';
-const output = './data/union-oaxaca-edited.geojson';
+if (!argv.i) return console.log('please provide an input file with -i {filename}');
+if (!argv.o) return console.log('please provide an input file with -o {filename');
+
+const input = argv.i;
+const output = argv.o;
 
 const stream = fs.createReadStream(input).pipe(JSONStream.parse(['features', true]));
 
