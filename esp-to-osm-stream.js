@@ -52,10 +52,10 @@ stream.on('data', (data) => {
   if (props.name == 'N/A') delete props.name;
   if (props.name == 'N/D') delete props.name;
 
-  // // PEAJE -> toll
-  // props.toll = props.PEAJE;
-  // delete props.PEAJE;
-  // props.toll = props.toll == 'Si' ? 'yes' : 'no';
+  // PEAJE -> toll
+  props.toll = props.PEAJE;
+  delete props.PEAJE;
+  props.toll = props.toll == 'Si' ? 'yes' : 'no';
 
   // NIVEL -> layer
   if (props.NIVEL > 0) props.layer = props.NIVEL;
@@ -73,6 +73,15 @@ stream.on('data', (data) => {
   props.width = props.ANCHO;
   delete props.ANCHO;
   if (props.width == 'N/A') delete props.width;
+
+  // CIRCULA -> oneway
+  props.oneway = props.CIRCULA;
+  delete props.CIRCULA;
+  if (props.oneway == 'Un sentido') props.oneway = 'yes';
+  else delete props.oneway;
+  // else if (props.oneway == 'Dos sentidos') props.oneway = 'no';
+  // else if (props.oneway == 'Cerrada en ambos sentidos') delete props.oneway;
+  // else if (props.oneway == 'N/A') delete props.oneway;
 
   // TIPO_VIAL -> highway
   // classify highway type by visualization level
@@ -96,7 +105,11 @@ stream.on('data', (data) => {
     if (props.highway == 'Carretera' &&
       props.ESCALA_VIS == 1 &&
       props.toll == 'yes') {
-      props.highway = 'motorway';
+        if (props.oneway == 'yes') {
+          props.highway = 'motorway';
+        } else {
+          props.highway = 'trunk';
+        }
     }
     else if (
       (props.highway == 'Carretera' ||
@@ -135,15 +148,6 @@ stream.on('data', (data) => {
   delete props.VELOCIDAD;
   if (props.maxspeed == 'N/A') delete props.width;
   props.maxspeed = +props.maxspeed;
-
-  // CIRCULA -> oneway
-  props.oneway = props.CIRCULA;
-  delete props.CIRCULA;
-  if (props.oneway == 'Un sentido') props.oneway = 'yes';
-  else delete props.oneway;
-  // else if (props.oneway == 'Dos sentidos') props.oneway = 'no';
-  // else if (props.oneway == 'Cerrada en ambos sentidos') delete props.oneway;
-  // else if (props.oneway == 'N/A') delete props.oneway;
 
   // COND_PAV -> surface
   // classify surface by RECUBRI as well
