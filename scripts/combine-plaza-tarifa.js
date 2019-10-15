@@ -51,3 +51,6 @@ for (var i = 0; i < peajes.features.length; i++) {
 }
 
 fs.writeFileSync(output,JSON.stringify(peajes,null,2));
+
+console.log('ALL DONE <3:', output);
+

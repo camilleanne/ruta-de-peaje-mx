@@ -81,6 +81,7 @@ To pull out a smaller test area (city of Oaxaca):
   * ~issues with ids -- why are they all negative? to keep out of osm id space? need to see if I can use id of geojson way as osm way id. I may need the original id's to integrate the plazas de peaje~
     * use `red-vial` branch of [ogr2osm](https://github.com/camilleanne/ogr2osm/)
     * this branch will keep all original IDs, any any generated IDs will be cast as negative.
+    * there will need to be an extra renumber step using osmium because OSRM doesn't like negative ids: https://github.com/Project-OSRM/osrm-backend/issues/5068#issuecomment-387508689
   * oneways -- everything seems ok in qgis -- oneways look like oneways going in the right direction, but need to confirm
   * to run the entire country from geojson is going to take... forever. need a bigger instance (running out of memory, not CPU)
 
@@ -129,11 +130,15 @@ for Oaxaca only:
 * merge `maniobra_prohibida` with `union` on `id_union`
 * export `maniobra_prohibida` before running `maniobra_prohibida-stream.js`
 
+node maniobra_prohibida-stream.js -i ./data/maniobra_prohibida-oaxaca-union.geojson -o ./data/maniobra_prohibida-oaxaca-edited.geojson
+
 * these restrictions do not include any sort of field for type of restriction. OSM requires one of: `no_right_turn`, `no_left_turn`, `no_u_turn`, `no_straight_on`, `only_right_turn`, `only_left_turn`, `only_straight_on`, `no_entry`, or `no_exit`. A restriction consists of a `from` member, 1 or more `via` members, and a `to` member. 
 * also only one node is every implicated in the restriction, regardless of number of ways involved. A heuristic for determining if the `via` should be the `union` node or multiple ways is number of implicated ways (have to count ways with `"N/A"` values)
 * A hueristic for assuming type of restriction is turn angle and number of members in the restriction. A simple restriction of two members and an angle of 90 is `no_right_turn`.
 
 NOTE: there's a massive problem with the turn restrictions in the data set. The union nodes have a range of 0 to over 1000000, but the referenced nodes in the turn restrictions data limits the id to 6 digits.
+
+how to turn a geojson into a relations file???
 
 
 ### docker and osrm:

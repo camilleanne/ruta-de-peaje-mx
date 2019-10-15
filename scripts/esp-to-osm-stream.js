@@ -58,7 +58,10 @@ stream.on('data', (data) => {
   props.toll = props.toll == 'Si' ? 'yes' : 'no';
 
   // NIVEL -> layer
-  if (props.NIVEL > 0) props.layer = props.NIVEL;
+  if (props.NIVEL != 0) {
+    props.layer = props.NIVEL;
+    if (props.NIVEL < 0) props.tunnel = 'yes';
+  }
   // props.layer = props.NIVEL;
   delete props.NIVEL;
 
@@ -77,7 +80,9 @@ stream.on('data', (data) => {
   // CIRCULA -> oneway
   props.oneway = props.CIRCULA;
   delete props.CIRCULA;
-  if (props.oneway == 'Un sentido') props.oneway = 'yes';
+  if (props.oneway == 'Un sentido') {
+    props.oneway = 'yes';
+  }
   else delete props.oneway;
   // else if (props.oneway == 'Dos sentidos') props.oneway = 'no';
   // else if (props.oneway == 'Cerrada en ambos sentidos') delete props.oneway;
@@ -99,7 +104,11 @@ stream.on('data', (data) => {
     if (props.ESCALA_VIS == 4) props.highway = 'tertiary_link';
     if (props.ESCALA_VIS == 5) props.highway = 'tertiary_link';
   } else {
-    if (props.highway == 'Glorieta') props.junction = 'roundabout';
+    // roundabout has implied 'oneway=yes'
+     if (props.highway == 'Glorieta') {
+      props.junction = 'roundabout';
+      delete props.oneway;
+    }
     else if (props.highway == 'Callejón') props.service = 'alley';
 
     if (props.highway == 'Carretera' &&
@@ -182,6 +191,6 @@ stream.on('close',((err)=>{
   // but tired of fighting with stream events
   fs.appendFile(output, '}', (err) => {
     if (err) return console.log(err);
-    console.log('ALL DONE <3');
+    console.log('ALL DONE <3:', output);
   });
 }));
