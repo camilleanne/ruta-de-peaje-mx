@@ -1,6 +1,5 @@
 // to do:
 //
-// - pass input and output filenames from CLI
 // - add flag for logging
 
 const fs = require('fs');

@@ -6,6 +6,14 @@ COORDINATES="-103.87847900390625 20.948614979019347 -102.74139404296875 20.36007
 # REGION="oaxaca"
 # COORDINATES="-96.82147979736 17.34146252563 -97.0195770263 17.24115372398"
 
+# 0. download data
+echo "downloading red-vial (mx road network)"
+# mkdir -p ./data/
+
+# curl -o ./data/red_vial_nacional.zip http://internet.contenidos.inegi.org.mx/contenidos/Productos/prod_serv/contenidos/espanol/bvinegi/productos/geografia/caminos/2018/889463674641_s.zip
+
+# tar xvf ./data/red_vial_nactional.zip -C ./data/
+
 # 1. extract red-vial
 echo "extracting road network"
 
@@ -73,24 +81,25 @@ echo "merged"
 # # 6. convert to OSM
 echo "ogr2osm start"
 
-python3 ./ogr2osm/ogr2osm.py -f ./data/$REGION-ALL.geojson
+python3 ./ogr2osm/ogr2osm.py -f ./data/$REGION-ALL.geojson -o ./osm/$REGION-ALL.osm
 
 echo "ogr2osm end"
 
 # # 7. renumber all the negative node ids:
 echo "osmium start"
 
-osmium sort -O -o $REGION-ALL-sort.osm $REGION-ALL.osm
+osmium sort -O -o ./osm/$REGION-ALL-sort.osm ./osm/$REGION-ALL.osm
 
-osmium renumber -O --object-type=node -o $REGION-ALL-renum.osm $REGION-ALL-sort.osm 
+osmium renumber -O --object-type=node -o ./osm/$REGION-ALL-renum.osm ./osm/$REGION-ALL-sort.osm 
 
 echo "osmium end"
 
 # OSRM and DOCKER
+cd osm/
 
-# docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-extract --small-component-size 1 -p ./car.lua /data/$REGION-ALL-renum.osm
+docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-extract --small-component-size 1 -p ./car.lua /data/$REGION-ALL-renum.osm
 
-# docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-partition /data/$REGION-ALL-renum.osrm
-# docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-customize /data/$REGION-ALL-renum.osrm
+docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-partition /data/$REGION-ALL-renum.osrm
+docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-customize /data/$REGION-ALL-renum.osrm
 
-# docker run -t -i -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/$REGION-ALL-renum.osrm
+docker run -t -i -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/$REGION-ALL-renum.osrm
